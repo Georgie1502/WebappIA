@@ -76,6 +76,61 @@ server/
 
 ---
 
+## Prompts documentés
+
+### System prompt — Agent CHRONOS (Mistral AI)
+
+Le system prompt définit la personnalité et les connaissances de CHRONOS. Il est envoyé à chaque requête comme premier message `role: system` :
+
+```
+Tu es CHRONOS, l'agent IA de TimeTravel Agency, une agence de voyage temporel fictive fondée en 2847.
+Tu réponds toujours en français, avec un ton élégant, enthousiaste et légèrement mystérieux.
+Tu connais parfaitement les 3 destinations disponibles :
+
+1. Égypte ancienne (-2560 av. J.-C.) — 4 200 TempoCoins, 3 à 5 jours
+   Activités, sécurité, architecture...
+
+2. Mars 2070 — 12 500 TempoCoins, 5 à 7 jours
+   Colonie Ares-7, rover, dômes pressurisés...
+
+3. Pompéi (79 ap. J.-C.) — 3 100 TempoCoins, 3 à 4 jours
+   Forum, thermes, domus, départ avant l'éruption...
+
+Garde tes réponses concises (2-4 phrases max), sauf si on te demande des détails.
+N'invente pas d'autres destinations ou services non mentionnés.
+```
+
+**Choix de conception :**
+- Ton mystérieux et élégant pour renforcer l'immersion
+- Connaissance limitée aux 3 destinations pour éviter les hallucinations
+- Réponses courtes par défaut pour un chat fluide
+
+### Prompts de fallback (règles par mots-clés)
+
+Lorsque l'API Mistral est indisponible, le chatbot utilise un système de règles documenté dans `src/utils/chatbot.ts`. Chaque règle associe une liste de mots-clés à une réponse formatée. Exemples de déclencheurs :
+
+| Mots-clés | Réponse |
+|-----------|---------|
+| `egypte`, `pyramide`, `pharaon` | Présentation Égypte + prix + durée |
+| `mars`, `2070`, `rover`, `dôme` | Présentation Mars + prix + durée |
+| `prix`, `tarif`, `combien` | Tableau comparatif des 3 destinations |
+| `sécurité`, `danger`, `risque` | Protocoles de sécurité |
+| `réserver`, `booking` | Guide de réservation étape par étape |
+
+### Prompt Google Stitch — Génération de la maquette
+
+Prompt utilisé pour générer le design initial de la webapp :
+
+```
+Design a futuristic time travel agency website called "TimeTravel Agency".
+Dark space theme with deep purple and gold accents. 3 destination cards:
+Ancient Egypt (-2560 BC), Mars 2070, Pompeii (79 AD).
+Include: hero section with portal animation, destination cards with era gradients,
+floating AI chatbot widget, booking form. Modern glassmorphism aesthetic.
+```
+
+---
+
 ## Outils IA utilisés
 
 ### Mistral AI — Agent CHRONOS
@@ -159,6 +214,44 @@ Le script `render-build` installe les dépendances frontend et backend, puis bui
 | Icônes | SVG inline custom |
 | Déploiement | [Render](https://render.com/) — hébergement full-stack |
 | Réservation externe | [Cal.com](https://cal.com/) — lien de consultation |
+
+---
+
+## Réflexion sur le processus
+
+### Ce qui a bien fonctionné
+
+**Architecture Atomic Design** — Séparer les composants en atoms → molecules → organisms → templates → pages a rendu le code très lisible et facile à maintenir. Modifier un seul composant (ex : `Badge`) met à jour toute l'interface.
+
+**Mistral API + fallback** — Implémenter un système de secours par règles s'est révélé indispensable : l'API Mistral en tier gratuit a des limites strictes (429 rate limit). Le fallback garantit que le chatbot répond toujours, même sans connexion à l'API.
+
+**Cloudinary** — Externaliser les images vers Cloudinary a simplifié le déploiement : pas d'images volumineuses dans le repo Git, chargement optimisé automatiquement par le CDN.
+
+### Difficultés rencontrées
+
+**Intégration Mistral API** — Deux erreurs successives à déboguer :
+- `401 Unauthorized` : la clé API était lue depuis le mauvais répertoire (`dotenv` cherchait `.env` à la racine au lieu de `server/.env`). Fix : `dotenv.config({ path: __dirname + '/.env' })`
+- `429 Too Many Requests` : le tier gratuit limite à ~1 req/seconde. Fix : retry automatique avec délai basé sur le header `retry-after`
+
+**Déploiement full-stack sur Render** — Vercel ne supporte pas Express.js directement. Solution retenue : faire servir le frontend buildé (`dist/`) par Express lui-même, avec un catch-all `app.get('*')` pour le routing SPA.
+
+**Navigation SPA** — Les liens de la navbar (scroll vers `#destinations`, `#booking`) ne fonctionnaient pas depuis les pages de détail car les sections n'existaient pas dans le DOM. Fix : détecter si on est sur `/`, sinon naviguer d'abord vers la home puis scroller.
+
+### Choix techniques et alternatives
+
+| Décision | Choix retenu | Alternative écartée | Raison |
+|----------|-------------|---------------------|--------|
+| Chatbot IA | Mistral API (`mistral-small-latest`) | ChatGPT API | Tier gratuit disponible sans carte bancaire initialement |
+| Déploiement | Render (full-stack) | Netlify (frontend seul) | Mistral API requiert un backend sécurisé pour la clé API |
+| Images | Cloudinary CDN | Fichiers locaux dans `public/` | Repo Git allégé, optimisation automatique |
+| Architecture UI | Atomic Design | Composants à plat | Maintenabilité et réutilisabilité à long terme |
+
+### Ce que j'ai appris
+
+- Structurer une webapp full-stack avec séparation frontend / backend claire (MVC + Atomic Design)
+- Intégrer une API IA (Mistral) avec gestion des erreurs, retry et fallback
+- Déployer un projet Node.js/Express sur Render avec build automatisé depuis GitHub
+- L'importance du `.gitignore` pour ne jamais exposer une clé API dans un repo public
 
 ---
 
