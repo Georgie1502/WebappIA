@@ -23,6 +23,7 @@ TimeTravel Agency est une webapp moderne et interactive mettant en scène une ag
 | Icônes | SVG inline custom + Lucide React |
 | Backend | Node.js + Express.js 4 |
 | IA | Mistral API (`mistral-small-latest`) |
+| Images | Cloudinary (CDN) |
 | Fonts | Google Fonts — Playfair Display, Space Grotesk |
 
 ### Architecture
@@ -43,7 +44,7 @@ server/
 ├── models/      → Destination.js, Booking.js
 ├── controllers/ → destinationController, bookingController, chatController
 ├── routes/      → /api/destinations, /api/bookings, /api/chat
-├── app.js       → Configuration Express + routes
+├── app.js       → Configuration Express + routes + static files
 └── server.js    → Point d'entrée (port 3001)
 ```
 
@@ -58,8 +59,9 @@ server/
 - **Formulaire de réservation** avec validation et confirmation
 - **Animations immersives** — portail en anneau (CSS conic-gradient), champ d'étoiles animé (Canvas), effets glassmorphism
 - **Design responsive** — mobile, tablette, desktop
-- **Navigation SPA** avec React Router (Home + pages détail par destination)
+- **Navigation SPA** avec React Router — retour automatique à la home depuis les pages détail
 - **API REST** complète : destinations, réservations, chat
+- **Déploiement full-stack** sur Render — Express sert à la fois l'API et le frontend buildé
 
 ### Endpoints API
 
@@ -90,7 +92,7 @@ server/
 
 ---
 
-## Installation
+## Installation (développement local)
 
 ### Prérequis
 - Node.js 18+
@@ -100,7 +102,7 @@ server/
 
 ```bash
 # 1. Cloner le projet
-git clone <url-du-repo>
+git clone https://github.com/Georgie1502/WebappIA.git
 cd WebappIA
 
 # 2. Installer les dépendances frontend
@@ -117,7 +119,7 @@ cp server/.env.example server/.env
 npm start
 ```
 
-L'application est accessible sur `http://localhost:5173`  
+L'application est accessible sur `http://localhost:5173`
 L'API tourne sur `http://localhost:3001`
 
 > Sans clé API Mistral, le chatbot fonctionne en mode fallback (réponses par règles).
@@ -131,6 +133,20 @@ L'API tourne sur `http://localhost:3001`
 
 ---
 
+## Déploiement (Render)
+
+Ce projet est déployé sur **Render** en service unique (Express sert le frontend buildé + l'API).
+
+| Champ | Valeur |
+|-------|--------|
+| **Build Command** | `npm run render-build` |
+| **Start Command** | `npm run render-start` |
+| **Variable d'env** | `MISTRAL_API_KEY` |
+
+Le script `render-build` installe les dépendances frontend et backend, puis build le frontend Vite. Express sert ensuite les fichiers statiques de `dist/` et gère les routes API.
+
+---
+
 ## Crédits
 
 | Ressource | Source |
@@ -138,15 +154,15 @@ L'API tourne sur `http://localhost:3001`
 | IA conversationnelle | [Mistral AI](https://mistral.ai/) — modèle `mistral-small-latest` |
 | Assistance développement | [Claude](https://claude.ai/) par Anthropic |
 | Design / maquette | [Google Stitch](https://stitch.withgoogle.com/) |
-| Images | [Cloudinary](https://cloudinary.com/) — hébergement et optimisation des images |
+| Images & Logo | [Cloudinary](https://cloudinary.com/) — hébergement et optimisation |
 | Fonts | [Google Fonts](https://fonts.google.com/) — Playfair Display, Space Grotesk |
 | Icônes | SVG inline custom |
+| Déploiement | [Render](https://render.com/) — hébergement full-stack |
 | Réservation externe | [Cal.com](https://cal.com/) — lien de consultation |
 
 ---
 
 ## Auteur
 
-Projet réalisé par **Jorgelina LEDESMA** — Ynov, 2026  
+Projet réalisé par **Jorgelina LEDESMA** — Ynov, 2026
 *© 2124 TimeTravel Agency. All dimensions reserved.*
-ù
