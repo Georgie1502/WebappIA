@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import NavLogo from '../molecules/NavLogo'
 
 const links = [
@@ -12,6 +12,8 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -23,7 +25,14 @@ export default function Navbar() {
     setOpen(false)
     if (href.startsWith('/#')) {
       const id = href.slice(2)
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      if (location.pathname === '/') {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        navigate('/')
+        setTimeout(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+        }, 150)
+      }
     }
   }
 
