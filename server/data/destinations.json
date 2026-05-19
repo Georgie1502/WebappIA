@@ -1,0 +1,29 @@
+[
+  {
+    "id": "paris",
+    "name": "Paris",
+    "year": "1889",
+    "badge": "BELLE ÉPOQUE",
+    "price": 2450,
+    "currency": "TempoCoins",
+    "available": true
+  },
+  {
+    "id": "cretace",
+    "name": "Le Crétacé",
+    "year": "-65 Ma",
+    "badge": "AVENTURE EXTRÊME",
+    "price": 8900,
+    "currency": "TempoCoins",
+    "available": true
+  },
+  {
+    "id": "florence",
+    "name": "Florence",
+    "year": "1504",
+    "badge": "RENAISSANCE",
+    "price": 3750,
+    "currency": "TempoCoins",
+    "available": true
+  }
+]
