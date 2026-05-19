@@ -4,7 +4,7 @@ export default function NavLogo() {
   return (
     <Link to="/" className="flex items-center gap-3 group">
       <img
-        src="/photos/logo.png"
+        src="https://res.cloudinary.com/dfinj1cig/image/upload/v1779205807/logo1_npbs8h.png"
         alt="TimeTravel Logo"
         className="h-10 w-10 object-contain"
       />
